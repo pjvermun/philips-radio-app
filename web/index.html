@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ORT7500 Remote</title>
+<style>
+  :root { --bg:#fafafa; --fg:#222; --muted:#777; --line:#ddd; --accent:#0b63ce; --card:#fff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#151515; --fg:#e8e8e8; --muted:#999; --line:#333; --accent:#5aa2ff; --card:#1e1e1e; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.4 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+  main { max-width: 720px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.2rem; margin: 0 0 12px; }
+  h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 8px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+  button, select { font: inherit; padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px;
+                   background: var(--card); color: var(--fg); cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button:disabled, select:disabled, input:disabled { opacity: .5; cursor: default; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grow { flex: 1; }
+  input[type=range] { width: 100%; }
+  .name { font-size: 1.3rem; font-weight: 600; }
+  .muted { color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; }
+  .grid button { text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #stations { max-height: 320px; overflow-y: auto; }
+  #log { font: 12px/1.3 ui-monospace, monospace; max-height: 200px; overflow-y: auto; white-space: pre-wrap; margin: 0; }
+  details summary { cursor: pointer; color: var(--muted); }
+  #status { font-size: .85rem; }
+</style>
+</head>
+<body>
+<main>
+  <div class="row" style="margin-bottom:12px">
+    <h1 class="grow" style="margin:0">Philips ORT7500</h1>
+    <span id="status" class="muted">not connected</span>
+    <button id="connect">Connect</button>
+  </div>
+
+  <section>
+    <h2>Now playing</h2>
+    <div class="name" id="np-name">–</div>
+    <div id="np-text" class="muted">&nbsp;</div>
+    <div class="row muted" style="margin-top:6px; font-size:.85rem">
+      <span id="np-mode"></span><span id="np-freq"></span><span id="np-signal"></span><span class="grow"></span><span id="np-clock"></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Controls</h2>
+    <div class="row" style="margin-bottom:10px">
+      <button id="power" data-ctl>Power</button>
+      <button id="mute" data-ctl>Mute</button>
+      <select id="mode" data-ctl></select>
+      <span class="grow"></span>
+      <button id="tune-down" data-ctl title="FM step down">◀</button>
+      <button id="tune-up" data-ctl title="FM step up">▶</button>
+    </div>
+    <div class="row">
+      <span class="muted">Vol</span>
+      <input id="volume" class="grow" type="range" min="0" max="32" value="0" data-ctl>
+      <span id="vol-val" style="width:2em; text-align:right">–</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Presets</h2>
+    <div id="presets" class="grid"><span class="muted">–</span></div>
+  </section>
+
+  <section>
+    <div class="row" style="margin-bottom:8px">
+      <h2 class="grow" style="margin:0">Stations</h2>
+      <button id="nav-up" data-ctl title="Up one folder">↑</button>
+      <button id="reload" data-ctl>Reload</button>
+    </div>
+    <div id="stations" class="grid"><span class="muted">–</span></div>
+  </section>
+
+  <section>
+    <details>
+      <summary>Log</summary>
+      <label class="muted"><input type="checkbox" id="rawlog"> show raw bytes</label>
+      <pre id="log"></pre>
+    </details>
+  </section>
+</main>
+
+<script>
+/* ---------- protocol (see PROTOCOL.md) ---------- */
+const N = { // address, type, enum
+  power:      [0x10103000, 'E8'], mode:   [0x10104000, 'U32'],
+  volume:     [0x10105100, 'U8'], mute:   [0x10105200, 'E8'],
+  volSteps:   [0x10102200, 'U8'],
+  fmLower:    [0x10102601, 'U32'], fmUpper: [0x10102602, 'U32'], fmStep: [0x10102603, 'U32'],
+  validModes: [0x10102100, 'LIST', ['C8', 'E8', 'C8']],          // id, selectable, label
+  name:       [0x10304010, 'C8'], text:   [0x10304020, 'C8'],
+  freq:       [0x1030C000, 'U32'], signal: [0x1030D000, 'U8'], playStatus: [0x10301000, 'E8'],
+  navState:   [0x10201000, 'E8'], navStatus: [0x10203000, 'E8'],
+  presets:    [0x10207000, 'LIST', ['C8']],                      // name
+  navList:    [0x10206000, 'LIST', ['C8', 'E8', 'E8']],          // name, type, subType
+  navigate:   [0x1020A010, 'U32'], selectItem: [0x1020A020, 'U32'], selectPreset: [0x1020A030, 'U32'],
+  time:       [0x10107300, 'C8'], date: [0x10107200, 'C8'],
+  dabScanUpdate: [0x10209000, 'U32'],
+};
+const BY_ADDR = Object.fromEntries(Object.entries(N).map(([k, v]) => [v[0], k]));
+const SIZE = { E8: 1, U8: 1, S8: 1, U16: 2, S16: 2, U32: 4, S32: 4 };
+const STATUS = { 0: 'OK', 1: 'LIST_END', 128: 'PACKET_BAD', 129: 'NODE_DOES_NOT_EXIST', 130: 'ITEM_DOES_NOT_EXIST', 131: 'NODE_BLOCKED', 133: 'FAIL' };
+const hex = b => [...b].map(x => x.toString(16).padStart(2, '0')).join(' ');
+const be = (v, n) => { const a = []; for (let i = n - 1; i >= 0; i--) a.push(Math.floor(v / 2 ** (8 * i)) & 255); return a; };
+const rd = (b, p, n) => { let v = 0; for (let i = 0; i < n; i++) v = v * 256 + b[p + i]; return v; };
+const cstr = b => new TextDecoder().decode(new Uint8Array(b.slice(0, b.indexOf(0) < 0 ? b.length : b.indexOf(0)))).trim();
+
+function checksum(d) { let a = 0, b = 0; for (const x of d) { a = (a + x) & 255; b = (b + a) & 255; } return a ^ b; }
+function slip(payload) {
+  const out = [0xC0];
+  for (const x of [...payload, checksum(payload)]) {
+    if (x === 0xC0) out.push(0xDB, 0xDC); else if (x === 0xDB) out.push(0xDB, 0xDD); else out.push(x);
+  }
+  out.push(0xC0); return new Uint8Array(out);
+}
+function unslip(f) {
+  const out = [];
+  for (let i = 0; i < f.length; i++) {
+    if (f[i] === 0xDB && (f[i + 1] === 0xDC || f[i + 1] === 0xDD)) { out.push(f[i + 1] === 0xDC ? 0xC0 : 0xDB); i++; }
+    else out.push(f[i]);
+  }
+  return out;
+}
+function decodeValue(type, raw) {
+  if (type === 'C8') return cstr(raw);
+  let v = rd(raw, 0, raw.length);
+  if (type[0] === 'S' && v >= 2 ** (8 * raw.length - 1)) v -= 2 ** (8 * raw.length);
+  return v;
+}
+
+/* ---------- transport: Web Serial, one request in flight ---------- */
+let port, writer, reader, frameNo = 0, pending = null, queue = [], rx = [];
+
+async function connect() {
+  if (!('serial' in navigator)) {
+    alert(!window.isSecureContext
+      ? 'Web Serial is blocked because this page is not on HTTPS/localhost.\n\nOn Android Chrome: open chrome://flags, enable "Insecure origins treated as secure", add ' + location.origin + ', then relaunch Chrome.'
+      : 'Web Serial is not available in this browser. Use Chrome 137+ on Android or Chrome/Edge on desktop.');
+    return;
+  }
+  try {
+    // Bluetooth SPP (RFCOMM) ports are only offered when their service UUID is allowed.
+    port = await navigator.serial.requestPort({ allowedBluetoothServiceClassIds: ['00001101-0000-1000-8000-00805f9b34fb'] });
+    await port.open({ baudRate: 115200 });
+  } catch (e) { log('connect failed: ' + e.message); return; }
+  writer = port.writable.getWriter();
+  setStatus('connected');
+  readLoop();
+  await sleep(500);                         // let the "Philips_001" greeting pass
+  await refreshAll();
+}
+
+async function readLoop() {
+  reader = port.readable.getReader();
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      for (const x of value) {
+        if (x !== 0xC0) { rx.push(x); continue; }
+        if (rx.length) handleFrame(rx);
+        rx = [];
+      }
+    }
+  } catch (e) { log('read error: ' + e.message); }
+  try { reader.releaseLock(); } catch {}
+  reader = null; setStatus('disconnected'); enable(false);
+}
+
+function handleFrame(f) {
+  const pkt = unslip(f);
+  const body = pkt.slice(0, -1), cs = pkt[pkt.length - 1];
+  if (rawlog.checked) log('RX ' + hex(pkt));
+  if (cs !== checksum(body) && cs !== 0xEF) {
+    const txt = String.fromCharCode(...f.filter(c => c >= 32 && c < 127));
+    if (txt.includes('Philips')) log('greeting: ' + txt); else if (rawlog.checked) log('bad checksum, dropped');
+    return;
+  }
+  const frame = rd(body, 0, 2);
+  if (frame === 0) return handleNotify(body);
+  if (pending && frame === pending.frame) { clearTimeout(pending.timer); const p = pending; pending = null; p.resolve(body); pump(); }
+}
+
+function request(payload) {
+  return new Promise((resolve, reject) => { queue.push({ payload, resolve, reject }); pump(); });
+}
+async function pump() {
+  if (pending || !queue.length || !writer) return;
+  const job = queue.shift();
+  frameNo = frameNo % 0xFFFF + 1;
+  const payload = [...be(frameNo, 2), ...job.payload];
+  pending = { frame: frameNo, resolve: job.resolve,
+              timer: setTimeout(() => { pending = null; job.reject(new Error('timeout')); pump(); }, 4000) };
+  const wire = slip(payload);
+  if (rawlog.checked) log('TX ' + hex(wire));
+  await writer.write(wire);
+}
+
+/* ---------- node operations ---------- */
+async function get(key) {
+  const [addr, type] = N[key];
+  const r = await request([0x00, 0x01, ...be(addr, 4)]);   // fr fr 80 01 status len(2) value
+  if (r[4] !== 0) throw new Error(`${key}: ${STATUS[r[4]] || r[4]}`);
+  const len = rd(r, 5, 2);
+  return decodeValue(type, r.slice(7, 7 + len));
+}
+async function set(key, value) {
+  const [addr, type] = N[key];
+  let data;
+  if (type === 'C8') { data = [...new TextEncoder().encode(value), 0]; }
+  else { const n = SIZE[type]; data = be(value < 0 ? value + 2 ** (8 * n) : value, n); }
+  const r = await request([0x04, 0x01, ...be(addr, 4), ...be(data.length, 2), ...data]); // -> fr fr 84 01 status
+  if (r[4] !== 0) throw new Error(`set ${key}: ${STATUS[r[4]] || r[4]}`);
+  log(`set ${key} = ${value}`);
+}
+async function listPage(key, startKey = -1, max = 20) {
+  const [addr, , fields] = N[key];
+  const nf = fields.length;
+  const r = await request([0x09, ...be(addr, 4), ...be(startKey < 0 ? 0xFFFFFFFF : startKey, 4), max, nf,
+                           ...fields.map((_, i) => i + 1), 0, 0]);
+  // fr fr 89 status count { key(4) nfields { len(2) data } }
+  const status = r[3];
+  if (status !== 0 && status !== 1) throw new Error(`${key}: ${STATUS[status] || status}`);
+  const items = []; let p = 5;
+  for (let i = 0; i < (r[4] || 0); i++) {
+    const item = { key: rd(r, p, 4), f: [] }; p += 5;
+    for (const t of fields) { const len = rd(r, p, 2); item.f.push(decodeValue(t, r.slice(p + 2, p + 2 + len))); p += 2 + len; }
+    items.push(item);
+  }
+  return { items, end: status === 1 || items.length === 0 };
+}
+async function listAll(key, maxPages = 25) {
+  const all = []; let start = -1;
+  for (let i = 0; i < maxPages; i++) {
+    const { items, end } = await listPage(key, start);
+    const fresh = items.filter(it => !all.some(a => a.key === it.key));
+    all.push(...fresh);
+    if (end || !items.length || !fresh.length) break;
+    start = items[items.length - 1].key;
+  }
+  return all;
+}
+function handleNotify(b) {               // 00 00 C6 addr(4) value (no length prefix)
+  const key = BY_ADDR[rd(b, 3, 4)];
+  if (!key || N[key][1] === 'LIST') return;
+  const type = N[key][1];
+  const raw = type === 'C8' ? b.slice(7) : b.slice(7, 7 + SIZE[type]);
+  const v = decodeValue(type, raw);
+  log(`notify ${key} = ${v}`);
+  applyState(key, v);
+  if (key === 'mode') onModeChanged();
+}
+
+/* ---------- UI ---------- */
+const $ = id => document.getElementById(id);
+const state = { modes: [] };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function log(s) { const l = $('log'); l.textContent += new Date().toLocaleTimeString() + '  ' + s + '\n'; l.scrollTop = l.scrollHeight; }
+function setStatus(s) { $('status').textContent = s; $('connect').textContent = port ? 'Disconnect' : 'Connect'; }
+function enable(on) { document.querySelectorAll('[data-ctl]').forEach(e => e.disabled = !on); }
+const safe = fn => async (...a) => { try { await fn(...a); } catch (e) { log('ERROR ' + e.message); setStatus('⚠ ' + e.message); } };
+async function disconnect() {
+  const p = port; port = null;
+  try { await reader.cancel(); } catch {}
+  await sleep(100);
+  try { writer.releaseLock(); } catch {}
+  try { await p.close(); } catch (e) { log('close: ' + e.message); }
+  writer = null; port = null; setStatus('disconnected'); enable(false);
+}
+
+function applyState(key, v) {
+  state[key] = v;
+  switch (key) {
+    case 'power':  $('power').classList.toggle('on', v === 1); $('power').textContent = v ? 'Power: on' : 'Power: off'; break;
+    case 'mute':   $('mute').classList.toggle('on', v === 1); break;
+    case 'volume': $('volume').value = v; $('vol-val').textContent = v; break;
+    case 'name':   $('np-name').textContent = v || '–'; break;
+    case 'text':   $('np-text').innerHTML = v ? '' : '&nbsp;'; if (v) $('np-text').textContent = v; break;
+    case 'signal': $('np-signal').textContent = 'signal ' + v; break;
+    case 'mode':   $('mode').value = v; const m = state.modes.find(m => m.key === v);
+                   $('np-mode').textContent = m ? m.f[2] : ''; updateTuning(); break;
+    case 'freq':   updateTuning(); break;
+    case 'time': case 'date': if (state.time && state.date)
+                   $('np-clock').textContent = `${state.date.slice(6, 8)}/${state.date.slice(4, 6)} ${state.time.slice(0, 2)}:${state.time.slice(2, 4)}`; break;
+  }
+}
+function isFM() { const m = state.modes.find(m => m.key === state.mode); return m && m.f[0] === 'FM'; }
+function updateTuning() {
+  const fm = isFM();
+  $('tune-down').hidden = $('tune-up').hidden = !fm;
+  $('np-freq').textContent = fm && state.freq && state.freq !== 0xFFFFFFFF ? (state.freq / 1000).toFixed(2) + ' MHz' : '';
+}
+
+async function tryGet(key) { try { applyState(key, await get(key)); } catch (e) { log(e.message); } }
+
+async function refreshAll() {
+  enable(true);
+  const steps = await get('volSteps').catch(() => 33);
+  $('volume').max = steps - 1;
+  state.modes = await listAll('validModes').catch(e => (log(e.message), []));
+  $('mode').innerHTML = state.modes.filter(m => m.f[1]).map(m => `<option value="${m.key}">${m.f[2]}</option>`).join('');
+  for (const k of ['power', 'mute', 'volume', 'mode', 'name', 'text', 'signal', 'freq', 'date', 'time']) await tryGet(k);
+  await loadNav();
+}
+
+async function loadNav() {
+  try { await set('navState', 1); } catch (e) { log(e.message); }
+  await loadPresets();
+  await loadStations();
+}
+async function ensureNav() {        // the app checks nav.state before every nav action
+  const s = await get('navState');
+  log(`nav.state = ${s}`);
+  if (s === 1) return;
+  await set('navState', 1);
+  // like the app: wait until nav.status is READY/READY_ROOT, then read the preset list once
+  for (let i = 0; i < 20; i++) {
+    const st = await get('navStatus').catch(() => -1);
+    log(`nav.status = ${st}`);
+    if (st === 1 || st === 4) break;
+    await sleep(250);
+  }
+  await listPage('presets').catch(e => log(e.message));
+}
+async function loadPresets() {
+  const box = $('presets');
+  try {
+    const items = (await listAll('presets', 2)).filter(p => p.f[0]);
+    box.innerHTML = items.length ? '' : '<span class="muted">no presets</span>';
+    for (const p of items) {
+      const b = document.createElement('button'); b.dataset.ctl = '';
+      b.textContent = `${p.key + 1}. ${p.f[0]}`; b.title = 'Long-press / right-click: store current station here';
+      b.onclick = safe(async () => {
+        await ensureNav();
+        // This radio answers OK to nav.action.selectPreset but ignores it, so play the
+        // station with the same name from the station list instead (selectItem works).
+        const norm = s => s.trim().toLowerCase();
+        const st = (state.stations || []).find(s => s.f[1] !== 0 && norm(s.f[0]) === norm(p.f[0]));
+        if (st) await set('selectItem', st.key);
+        else await set('selectPreset', p.key);
+        await sleep(2000); await refreshNowPlaying();
+        log(`now playing: ${state.name}`);
+      });
+      b.oncontextmenu = e => { e.preventDefault(); if (confirm(`Store current station in preset ${p.key + 1}?`)) safe(async () => { await set('addPreset', p.key); await loadPresets(); })(); };
+      box.append(b);
+    }
+  } catch (e) { box.innerHTML = `<span class="muted">${e.message}</span>`; }
+}
+N.addPreset = [0x1030E000, 'U32'];
+
+async function loadStations() {
+  const box = $('stations');
+  box.innerHTML = '<span class="muted">loading…</span>';
+  try {
+    const items = await listAll('navList');
+    state.stations = items;
+    box.innerHTML = items.length ? '' : '<span class="muted">empty</span>';
+    for (const it of items) {
+      const [name, type] = it.f;
+      const b = document.createElement('button'); b.dataset.ctl = '';
+      b.textContent = (type === 0 ? '📁 ' : '') + name;
+      b.onclick = safe(async () => {
+        if (type === 0) { await set('navigate', it.key); await sleep(500); await loadStations(); }
+        else { await ensureNav(); await set('selectItem', it.key); await sleep(2000); await refreshNowPlaying(); }
+      });
+      box.append(b);
+    }
+  } catch (e) { box.innerHTML = `<span class="muted">${e.message}</span>`; }
+}
+async function refreshNowPlaying() { for (const k of ['name', 'text', 'signal', 'freq']) await tryGet(k); }
+async function onModeChanged() { await sleep(1500); await refreshNowPlaying(); await loadNav(); }
+
+/* ---------- wire up ---------- */
+enable(false);
+$('connect').onclick = () => port ? disconnect() : connect();
+$('power').onclick = safe(async () => { const v = state.power ? 0 : 1; await set('power', v); applyState('power', v); });
+$('mute').onclick = safe(async () => { const v = state.mute ? 0 : 1; await set('mute', v); applyState('mute', v); });
+$('volume').oninput = () => $('vol-val').textContent = $('volume').value;
+$('volume').onchange = safe(async () => { const v = +$('volume').value; await set('volume', v); applyState('volume', v); });
+$('mode').onchange = safe(async () => { const v = +$('mode').value; await set('mode', v); applyState('mode', v); await onModeChanged(); });
+$('reload').onclick = safe(loadNav);
+$('nav-up').onclick = safe(async () => { await set('navigate', -1); await sleep(500); await loadStations(); });
+async function tune(dir) {
+  const [lo, hi, step] = [await get('fmLower'), await get('fmUpper'), await get('fmStep')];
+  let f = (await get('freq')) + dir * step;
+  if (f < lo) f = hi; if (f > hi) f = lo;
+  await set('freq', f); applyState('freq', f);
+  await sleep(800); await refreshNowPlaying();
+}
+$('tune-down').onclick = safe(() => tune(-1));
+$('tune-up').onclick = safe(() => tune(1));
+setInterval(() => { if (writer && !pending && !queue.length) safe(async () => { await tryGet('time'); await tryGet('signal'); })(); }, 30000);
+</script>
+</body>
+</html>

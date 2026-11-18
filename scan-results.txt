@@ -1,0 +1,135 @@
+# connected, greeting: b'Philips_001'
+# checksum mismatch, dropped: 00 05 00 ff ff
+nav.action.dabPrune                        {'frame': 1, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_BLOCKED'}
+nav.action.dabScan                         {'frame': 2, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': '0 (IDLE)'}
+nav.action.navigate                        {'frame': 3, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_BLOCKED'}
+nav.action.selectItem                      {'frame': 4, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_BLOCKED'}
+nav.action.selectPreset                    {'frame': 5, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_BLOCKED'}
+nav.caps                                   {'frame': 6, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 3}
+nav.dabScanUpdate                          {'frame': 7, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_BLOCKED'}
+nav.errorStr                               {'frame': 8, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_BLOCKED'}
+nav.numItems                               {'frame': 9, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_BLOCKED'}
+nav.searchTerm                             {'frame': 10, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+nav.state                                  {'frame': 11, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': '0 (OFF)'}
+nav.status                                 {'frame': 12, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_BLOCKED'}
+play.addPreset                             {'frame': 13, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 0}
+play.caps                                  {'frame': 14, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 2060}
+play.control                               {'frame': 15, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': '1 (PLAY)'}
+play.errorStr                              {'frame': 16, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': ''}
+play.feedback                              {'frame': 17, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+play.frequency                             {'frame': 18, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 4294967295}
+play.info.album                            {'frame': 19, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': ''}
+play.info.artist                           {'frame': 20, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': ''}
+play.info.duration                         {'frame': 21, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 0}
+play.info.graphicUri                       {'frame': 22, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+play.info.name                             {'frame': 23, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 'VRT StuBru      '}
+play.info.text                             {'frame': 24, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 'Studio Brussel'}
+play.position                              {'frame': 25, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 0}
+play.rate                                  {'frame': 26, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 1}
+play.repeat                                {'frame': 27, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+play.scrobble                              {'frame': 28, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+play.serviceIds.dabEnsembleId              {'frame': 29, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 24577}
+play.serviceIds.dabScids                   {'frame': 30, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 0}
+play.serviceIds.dabServiceId               {'frame': 31, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 25348}
+play.serviceIds.ecc                        {'frame': 32, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 224}
+play.serviceIds.fmRdsPi                    {'frame': 33, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 0}
+play.shuffle                               {'frame': 34, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+play.signalStrength                        {'frame': 35, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 251}
+play.status                                {'frame': 36, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': '2 (PLAYING)'}
+sys.audio.eqCustom.param0                  {'frame': 37, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.audio.eqCustom.param1                  {'frame': 38, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.audio.eqCustom.param2                  {'frame': 39, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.audio.eqCustom.param3                  {'frame': 40, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.audio.eqCustom.param4                  {'frame': 41, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.audio.eqLoudness                       {'frame': 42, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.audio.eqPreset                         {'frame': 43, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.audio.mute                             {'frame': 44, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': '0 (NOT_MUTE)'}
+sys.audio.volume                           {'frame': 45, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 5}
+sys.caps.fmFreqRange.lower                 {'frame': 46, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 87500}
+sys.caps.fmFreqRange.stepSize              {'frame': 47, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 50}
+sys.caps.fmFreqRange.upper                 {'frame': 48, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 108000}
+sys.caps.volumeSteps                       {'frame': 49, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 33}
+sys.clock.dst                              {'frame': 50, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.clock.localDate                        {'frame': 51, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': '20261118'}
+sys.clock.localTime                        {'frame': 52, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': '084114'}
+sys.clock.mode                             {'frame': 53, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': '1 (_24_HOUR)'}
+sys.clock.source                           {'frame': 54, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 15}
+sys.clock.utcOffset                        {'frame': 55, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.info.friendlyName                      {'frame': 56, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.info.radioId                           {'frame': 57, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.info.radioPin                          {'frame': 58, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.info.version                           {'frame': 59, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 'dab-scbmmi-FS2052-0000-0475_V5.1.7.EX36922-1A28'}
+sys.isu.control                            {'frame': 60, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.isu.state                              {'frame': 61, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.isu.version                            {'frame': 62, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.lang                                   {'frame': 63, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 0}
+sys.mode                                   {'frame': 64, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': 0}
+sys.net.commitChanges                      {'frame': 65, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.ipConfig.address                   {'frame': 66, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.ipConfig.dhcp                      {'frame': 67, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.ipConfig.dnsPrimary                {'frame': 68, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.ipConfig.dnsSecondary              {'frame': 69, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.ipConfig.gateway                   {'frame': 70, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.ipConfig.subnetMask                {'frame': 71, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.keepConnected                      {'frame': 72, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wired.interfaceEnable              {'frame': 73, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wired.macAddress                   {'frame': 74, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+# notify {'frame': 0, 'op': '0xc6', 'type': 'notify', 'node': 'play.info.text', 'value': 'JOHN NEWMAN - Love me again'}
+sys.net.wlan.connectedSSID                 {'frame': 75, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.interfaceEnable               {'frame': 76, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.macAddress                    {'frame': 77, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.performWPS                    {'frame': 78, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.region                        {'frame': 79, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.rssi                          {'frame': 80, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.scan                          {'frame': 81, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.selectAP                      {'frame': 82, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.setAuthType                   {'frame': 83, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.setEncType                    {'frame': 84, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.setPassphrase                 {'frame': 85, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.setSSID                       {'frame': 86, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.net.wlan.wpsPinRead                    {'frame': 87, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.power                                  {'frame': 88, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_OK', 'value': '1 (ON)'}
+sys.rsa.publicKey                          {'frame': 89, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+sys.rsa.status                             {'frame': 90, 'op': '0x80', 'type': 'get-rsp', 'status': 'FS_NODE_DOES_NOT_EXIST'}
+TX c0 00 01 09 10 10 21 00 ff ff ff ff 14 03 01 02 03 00 00 c8 c0
+RX 00 01 89 01 04 00 00 00 00 03 00 04 44 41 42 00 00 01 01 00 05 44 41 42 0a 00 00 00 00 01 03 00 03 46 4d 00 00 01 01 00 04 46 4d 0a 00 00 00 00 02 03 00 07 53 4d 54 44 45 56 00 00 01 01 00 0e 53 6d 61 72 74 20 44 65 76 69 63 65 0a 00 00 00 00 03 03 00 06 41 55 58 49 4e 00 00 01 01 00 11 41 75 78 69 6c 69 61 72 79 20 49 6e 70 75 74 0a 00 ad
+sys.caps.validModes {'frame': 1, 'op': '0x89', 'type': 'list-rsp', 'status': 'FS_LIST_END', 'items': [{'key': 0, 'id': 'DAB', 'selectable': 1, 'label': 'DAB\n'}, {'key': 1, 'id': 'FM', 'selectable': 1, 'label': 'FM\n'}, {'key': 2, 'id': 'SMTDEV', 'selectable': 1, 'label': 'Smart Device\n'}, {'key': 3, 'id': 'AUXIN', 'selectable': 1, 'label': 'Auxiliary Input\n'}], 'list_end': True}
+
+Traceback (most recent call last):
+  File "/home/pjv/Documents/proj/philips radio/fsbt.py", line 395, in <module>
+    main()
+    ~~~~^^
+  File "/home/pjv/Documents/proj/philips radio/fsbt.py", line 373, in main
+    r = Radio(a.mac, a.channel, a.verbose)
+  File "/home/pjv/Documents/proj/philips radio/fsbt.py", line 283, in __init__
+    self.s.connect((mac, channel))
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+ConnectionResetError: [Errno 104] Connection reset by peer
+
+TX c0 00 01 09 10 10 23 00 ff ff ff ff 14 01 01 00 00 b4 c0
+RX 00 01 89 85 00 a6
+sys.caps.eqPresets {'frame': 1, 'op': '0x89', 'type': 'list-rsp', 'status': 'FS_FAIL'}
+
+TX c0 00 01 09 10 10 24 00 ff ff ff ff 14 03 01 02 03 00 00 b4 c0
+RX 00 01 89 85 00 a6
+sys.caps.eqBands {'frame': 1, 'op': '0x89', 'type': 'list-rsp', 'status': 'FS_FAIL'}
+
+Traceback (most recent call last):
+  File "/home/pjv/Documents/proj/philips radio/fsbt.py", line 395, in <module>
+    main()
+    ~~~~^^
+  File "/home/pjv/Documents/proj/philips radio/fsbt.py", line 373, in main
+    r = Radio(a.mac, a.channel, a.verbose)
+  File "/home/pjv/Documents/proj/philips radio/fsbt.py", line 283, in __init__
+    self.s.connect((mac, channel))
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+ConnectionResetError: [Errno 104] Connection reset by peer
+
+TX c0 00 01 09 10 20 70 00 ff ff ff ff 14 01 01 00 00 46 c0
+RX 00 01 89 83 00 a8
+nav.presets {'frame': 1, 'op': '0x89', 'type': 'list-rsp', 'status': 'FS_NODE_BLOCKED'}
+
+TX c0 00 01 09 10 20 60 00 ff ff ff ff 14 03 01 02 03 00 00 0c c0
+RX 00 01 89 83 00 a8
+nav.list {'frame': 1, 'op': '0x89', 'type': 'list-rsp', 'status': 'FS_NODE_BLOCKED'}
+
